@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // type Video struct {
 // 	gorm.Model
@@ -29,6 +33,100 @@ type Video struct {
 	IsFavorite    bool      `gorm:"-"`
 	Author        User      `gorm:"-"`
 	AuthorID      uint      `gorm:"index"`
-	Likers        []User    `gorm:"many2many:user_video"` // Many-to-many relationship with User for likers
-	Comments      []Comment `gorm:"foreignKey:CVideo"`    // One-to-many relationship with Comment
+	Likers        []User    `gorm:"many2many:user_favorite_video"` // Many-to-many relationship with User for likers
+	Comments      []Comment `gorm:"foreignKey:VideoID"`            // One-to-many relationship with Comment
+}
+
+func CreateVideo(video *Video) error {
+	var err error
+	db, _ := GetDB()
+	err = db.Create(video).Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func GetVideoOrderByTime(time time.Time) ([]Video, error) {
+	db, _ := GetDB()
+	var videos []Video
+	// get all videos
+	err := db.Where("created_at < ?", time).Order("created_at desc").Limit(30).Find(&videos).Error
+	return videos, err
+}
+
+func GetVideoAfterTime(time time.Time) ([]Video, error) {
+	db, _ := GetDB()
+	var videos []Video
+	// get all videos
+	err := db.Where("created_at > ?", time).Order("created_at desc").Limit(30).Find(&videos).Error
+	return videos, err
+
+}
+
+func GetVideoById(id uint) (*Video, error) {
+	var video Video
+	db, _ := GetDB()
+	// get video
+	err := db.Where("id = ?", id).First(&video).Error
+	if err != nil {
+		return nil, err
+	}
+	return &video, nil
+}
+
+func GetVideosByUser(user *User) ([]Video, error) {
+	var videos []Video
+	db, _ := GetDB()
+	err := db.Model(user).Association("Videos").Find(&videos)
+	return videos, err
+}
+
+func AddFavoriteVideo(user *User, video *Video) error {
+	var err error
+	db, _ := GetDB()
+	err = db.Model(user).Association("FavoriteVideos").Append(video)
+	if err != nil {
+		return err
+	}
+	err = UpdateVideoFavoriteCount(video)
+	return err
+}
+
+func UnFavoriteVideo(user *User, video *Video) error {
+	var err error
+	db, _ := GetDB()
+	err = db.Model(user).Association("FavoriteVideos").Delete(video)
+	if err != nil {
+		return err
+	}
+	err = UpdateVideoFavoriteCount(video)
+	return err
+}
+
+func GetUserFavoriteVideos(user *User) ([]Video, error) {
+	var videos []Video
+	db, _ := GetDB()
+	err := db.Model(user).Association("FavoriteVideos").Find(&videos)
+	return videos, err
+}
+
+func UpdateVideoFavoriteCount(video *Video) error {
+	db, _ := GetDB()
+	num_favorite := db.Model(video).Association("Likers").Count()
+	return db.Model(video).Update("FavoriteCount", num_favorite).Error
+}
+
+func IsFavoriteVideo(user *User, video *Video) bool {
+	db, _ := GetDB()
+	var u User
+	db.Model(video).Association("Likers").Find(&u, user.ID)
+	return u.ID != 0
+}
+
+func UpdateVideoCommentCount(video *Video) error {
+	db, _ := GetDB()
+	num_comment := db.Model(video).Association("Comments").Count()
+	return db.Model(video).Update("comment_count", num_comment).Error
 }
