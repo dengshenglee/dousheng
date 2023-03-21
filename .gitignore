@@ -13,3 +13,10 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+#
+dockers/minIO/go.mod
+dockers/minIO/go.sum
+dockers/minIO/main.go
+dockers/minIO/cartoon.mp4
+dockers/redis/data
+dockers/rabbitmq/mq-test
