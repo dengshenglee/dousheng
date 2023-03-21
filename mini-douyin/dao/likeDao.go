@@ -20,15 +20,15 @@ func (Like) TableName() string {
 }
 
 // Get liked VideoId List By UserId
-func GetLikeListByUserId(userId int64) ([]int64, int64, error) {
+func GetLikeListByUserId(userId int64) ([]int64, error) {
 	var LikedList []int64
 	result := Db.Model(&Like{}).Where("user_id=? and liked=?", userId, 1).Order("created_at desc").Pluck("video_id", &LikedList)
-	likedCnt := result.RowsAffected
+	// likedCnt := result.RowsAffected
 	if result.Error != nil {
 		log.Println("LikedVideoIdList:", result.Error.Error())
-		return nil, -1, result.Error
+		return nil, result.Error
 	}
-	return LikedList, likedCnt, nil
+	return LikedList, nil
 }
 
 // Get Liked Count By VideoId

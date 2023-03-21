@@ -27,11 +27,10 @@ func TestUpdateLikeInfo(t *testing.T) {
 }
 
 func TestGetLikeListByUserId(t *testing.T) {
-	list, cnt, err := GetLikeListByUserId(1)
+	list, err := GetLikeListByUserId(1)
 	if err != nil {
 		log.Print(err.Error())
 	}
-	log.Println(cnt)
 	for _, v := range list {
 		fmt.Printf("%d\n", v)
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func TestInsertUser(t *testing.T) {
-	user := UserBasicInfo{Name: "ut", Password: "unit test"}
+	user := UserBasicInfo{Name: "ut2", Password: "unit test"}
 	flag := InsertUser(&user)
 	log.Println(flag)
 }

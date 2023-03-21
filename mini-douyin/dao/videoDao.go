@@ -31,12 +31,12 @@ func saveVideo(video Video) error {
 }
 
 // 上传视频
-func UploadVideo(videoName string, authorId int64, videoTitle string) error {
+func UploadVideo(videoName string, authorId int64, videoTitle string, play_url string) error {
 	var video Video
 	video.AuthorId = authorId
 	video.Title = videoTitle
-	video.PlayUrl = config.PLAY_URL_PREFIX + videoName + ".mp4"
-	video.CoverUrl = video.PlayUrl + config.COVER_URL_SUFFIX
+	video.PlayUrl = play_url
+	video.CoverUrl = config.VIDEO_COVER_IMAGE
 	video.CreatedAt = time.Now()
 	video.UpdatedAt = time.Now()
 	return saveVideo(video)

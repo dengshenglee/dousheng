@@ -8,7 +8,7 @@ import (
 )
 
 func TestUploadVideo(t *testing.T) {
-	UploadVideo("VID_2023_1_29", 1, "测试视频1")
+	UploadVideo("VID_2023_1_29", 1, "测试视频1", "url:test")
 }
 
 func TestGetVideosByUserId(t *testing.T) {
